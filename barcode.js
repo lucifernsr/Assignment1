@@ -1,6 +1,6 @@
 "use strict";
 
-//R1.1 Mapping area-pattern strings to digits.
+//R1.1 - Mapped area-pattern strings.
 var areaPatternsRef = {
     leftOdd : {
         Zero : "0001101",
@@ -40,7 +40,7 @@ var areaPatternsRef = {
     }
 };
 
-//R1.2 Extracted output character strings and guards.
+//R1.2 - Extracted output character strings and guards.
 var areaSorted = {
 		areaPatterns : {
             One : "",
@@ -61,7 +61,7 @@ var areaSorted = {
         rightGuard : ""
     };
 
-// Main function.
+// Index function.
 function decodeBarcodeFromAreas(areas) {
     var result = {
         barcode: "123456", 
@@ -74,7 +74,7 @@ function decodeBarcodeFromAreas(areas) {
     return result;
 }
 
-// Function for extracting area pattern strings and saving them in the global object.
+// R1.2 - Function for extracting area pattern strings and saving them in the global object.
 function extractAreaPatternStrings(areas) {
     // Check if the left guard is there.
     if (areas.substr(0,3) === "101") {
@@ -168,4 +168,18 @@ function extractAreaPatternStrings(areas) {
         }
 	}
     }
-}
+};
+
+// R1.3 - Function for detecting the guards and outputting a message.
+function detectGuards(areaSorted) {
+    var errorMessage = "";
+    if (areaSorted.leftGuard === "") {
+        errorMessage = "No Left guard";    
+    }
+    else if (areaSorted.centerGuard === "") {
+        errorMessage = "No Center guard";    
+    }
+    else if (areaSorted.rightGuard === "") {
+        errorMessage = "No Right guard";    
+    }
+};
