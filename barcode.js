@@ -7,6 +7,9 @@ var areaPatternsRef = {
     right : ["1110010", "1100110", "1101100", "1000010", "1011100", "1001110", "1010000", "1000100", "1001000", "1110100"]
 };
 
+//R2.1 - Mapped parity-pattern strings.
+var parityPatternsRef = ["LLLLLL", "LLGLGG", "LLGGLG", "LLGGGL", "LGLLGG", "LGGLLG", "LGGGLL", "LGLGLG", "LGLGGL", "LGGLGL"];
+
 //R1.2 - Extracted output character strings and guards.
 var areaSorted = {
 		areaPatterns : {
