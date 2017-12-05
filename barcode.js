@@ -49,7 +49,14 @@ function decodeBarcodeFromAreas(areas) {
     result.barcode = convertToDigits(areaSorted);
     
     // Get the parity digit and add it to the start of the barcode string.
-    result.barcode = determineParityDigit(areaSorted) + result.barcode
+    var barcodeString = determineParityDigit(areaSorted) + result.barcode
+    result.barcode = barcodeString;
+    
+    // Get the check digit and save it in another variable.
+    var checkDigit = calculateChecksum(barcodeString);
+    
+    // Get the checksum validity and stores in the result object.
+    result.checksumValid = checkDigitValidity(barcodeString, checkDigit)
     
     // Return the result object which contains barcode, checksum validity and an error message if any.
     return result;
@@ -165,7 +172,7 @@ function detectGuards(areaSorted) {
         errorMessage = "No Right guard";    
     }
     else {
-        errorMessage = "All the guards present. XD"
+        errorMessage = "All the guards present."
     }
     
     return errorMessage;
@@ -248,7 +255,7 @@ function getParity(areaPattern) {
     return parity;
 }
 
-// R1.4 - Function for flip the obtained barcode area patterns in case of a barcode read backwards.
+// R1.4 - Function for flipping the obtained barcode area patterns in case of a barcode read backwards.
 function flipAreaPatterns(areaSorted) {
     var tempAreaPatterns = [];
     var i = 0;
@@ -264,7 +271,7 @@ function flipAreaPatterns(areaSorted) {
     }
 }
 
-// R2.2 - Function for calculate the parity digit.
+// R2.2 - Function for calculating the parity digit.
 function determineParityDigit(areaSorted) {
     var tempLeftAreaPatterns = [];
     var i = 0;
@@ -300,4 +307,36 @@ function determineParityDigit(areaSorted) {
         console.log("Parity Error!")
     }
     return parityDigit.toString();
+}
+
+// R2.3 - Function for calculating the checksum value.
+function calculateChecksum(barcodeString) {
+    var barcodeArray = barcodeString.split("");
+    barcodeArray.reverse();
+    
+    var sum = 0;
+    for (var i = 1; i <= 12; i+=2) {
+        sum += barcodeArray[i] * 3 
+    }
+    for (var j = 2; j <= 12; j+=2) {
+        sum += barcodeArray[j] * 1 
+    }
+    barcodeArray[0] = sum;
+    
+    var roundedSum = (parseInt((sum/10).toString(),10) + 1) * 10;
+	var checkDigit = roundedSum - sum;
+    return checkDigit;
+}
+
+// R2.4 - Function for checking the check digit validity.
+function checkDigitValidity(barcodeString, checkDigit) {
+    var rightMostDigit = Number(barcodeString.substr(12,1));
+    var validity;
+    if (rightMostDigit === checkDigit) {
+        validity = true;
+    }
+    else {
+        validity = false;
+    }
+    return validity;
 }
