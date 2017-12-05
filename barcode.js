@@ -51,6 +51,7 @@ function decodeBarcodeFromAreas(areas) {
     // Get the parity digit and add it to the start of the barcode string.
     result.barcode = determineParityDigit(areaSorted) + result.barcode
     
+    // Return the result object which contains barcode, checksum validity and an error message if any.
     return result;
 }
 
@@ -162,6 +163,9 @@ function detectGuards(areaSorted) {
     }
     else if (areaSorted.rightGuard === "") {
         errorMessage = "No Right guard";    
+    }
+    else {
+        errorMessage = "All the guards present. XD"
     }
     
     return errorMessage;
@@ -285,10 +289,15 @@ function determineParityDigit(areaSorted) {
     }
     
     var parityDigit = "";
+    var parityError;
     for (var k = 0; k < parityPatternsRef.length; k++) {
         if (parityPattern === parityPatternsRef[k]) {
             parityDigit = k;
+            parityError = false;
         }
+    }
+    if (parityError !== false) {
+        console.log("Parity Error!")
     }
     return parityDigit.toString();
 }
