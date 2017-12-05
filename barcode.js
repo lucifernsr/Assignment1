@@ -48,6 +48,9 @@ function decodeBarcodeFromAreas(areas) {
     // Convert the area pattern strings obtained into digits and save them in the results object.
     result.barcode = convertToDigits(areaSorted);
     
+    // Get the parity digit and add it to the start of the barcode string.
+    result.barcode = determineParityDigit(areaSorted) + result.barcode
+    
     return result;
 }
 
@@ -67,6 +70,7 @@ function extractAreaPatternStrings(areas) {
 		
         // Checking if the center guard is there.
 		if (areas.substr(45,5) === "01010") {
+            
 			areaSorted.centerGuard = "01010";
 			{
 				areaSorted.areaPatterns.Seven = areas.substr(50,7);
@@ -182,18 +186,24 @@ function convertToDigits(areaSorted) {
     // Loop through the area patterns to determine digits.
     var tempDigits = [0];
     
-    // Loop through all the Left-Odd digits.
-    for (var i = 1; i <= 6; i+=2) {
+    // Check the leftmost digit.
+    for (var j = 0; j <= areaPatternsRef.leftOdd.length; j++) {
+        if (tempAreaPatterns[0] === areaPatternsRef.leftOdd[j]) {
+            tempDigits[0] = j;
+        }
+    }
+    
+    // Loop through the rest of left digits.
+    for (var i = 1; i < 7; i++) {
+		// Loop through the Left-Odd data to determine if the area is from that.
         for (var j = 0; j <= areaPatternsRef.leftOdd.length; j++) {
             if (tempAreaPatterns[i] === areaPatternsRef.leftOdd[j]) {
                 tempDigits[i] = j;
             }
         }
-    }
-    
-    // Loop through all the Left-Even digits.
-    for (var i = 2; i <= 6; i+=2) {
-        for (var j = 0; j <= areaPatternsRef.leftEven.length; j++) {
+	
+		// Loop through the Left-Even data to determine if the area is from that.
+		for (var j = 0; j <= areaPatternsRef.leftEven.length; j++) {
             if (tempAreaPatterns[i] === areaPatternsRef.leftEven[j]) {
                 tempDigits[i] = j;
             }
@@ -201,7 +211,7 @@ function convertToDigits(areaSorted) {
     }
     
     // Loop through all the Right digits.
-    for (var i = 7; i<= (tempAreaPatterns.length - 1); i++) {
+    for (var i = 7; i<= (tempAreaPatterns.length - 1); i++) {   
         for (var j = 0; j <= areaPatternsRef.right.length; j++) {
             if (tempAreaPatterns[i] === areaPatternsRef.right[j]) {
                 tempDigits[i] = j;
@@ -212,7 +222,7 @@ function convertToDigits(areaSorted) {
     // Saving the digits in a string for returning.
     var digits = "";
     for (var k = 1; k < tempDigits.length; k++) {
-        digits += `${tempDigits[k]}`
+        digits += `${tempDigits[k]}`;
     }
     return digits;
 }
@@ -248,4 +258,37 @@ function flipAreaPatterns(areaSorted) {
         areaSorted.areaPatterns[props] = tempAreaPatterns[i];
         i++;
     }
+}
+
+// R2.2 - Function for calculate the parity digit.
+function determineParityDigit(areaSorted) {
+    var tempLeftAreaPatterns = [];
+    var i = 0;
+    for (var props in areaSorted.areaPatterns) {
+		tempLeftAreaPatterns[i] = areaSorted.areaPatterns[props];
+		i++;
+		if (i > 5) {
+			break;
+		}
+	}
+	
+    var parityPattern = "";
+    var parityVal;
+    for (var props in tempLeftAreaPatterns) {
+        parityVal = getParity(tempLeftAreaPatterns[props]);
+        
+        if (parityVal === "odd") {     
+            parityPattern += "L";
+        } else if (parityVal === "even") {
+            parityPattern += "G";
+        }
+    }
+    
+    var parityDigit = "";
+    for (var k = 0; k < parityPatternsRef.length; k++) {
+        if (parityPattern === parityPatternsRef[k]) {
+            parityDigit = k;
+        }
+    }
+    return parityDigit.toString();
 }
