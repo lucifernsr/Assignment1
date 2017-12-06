@@ -257,17 +257,21 @@ function getParity(areaPattern) {
 
 // R1.4 - Function for flipping the obtained barcode area patterns in case of a barcode read backwards.
 function flipAreaPatterns(areaSorted) {
-    var tempAreaPatterns = [];
-    var i = 0;
+    var tempAreaString = "";
     for (var props in areaSorted.areaPatterns) {
-        tempAreaPatterns[i] = areaSorted.areaPatterns[props];
-        i++;
+        tempAreaString += areaSorted.areaPatterns[props];
     }
-    i = 0;
-    tempAreaPatterns.reverse();
-    for (var props in areaSorted.areaPatterns) {
-        areaSorted.areaPatterns[props] = tempAreaPatterns[i];
-        i++;
+    console.log(tempAreaString);
+	var newAreaString = tempAreaString.split("").reverse().join("");
+	var newArray = [];
+	for (var k = 0; k < 12; k++) {
+		newArray[k] = newAreaString.substr(k*7,7);
+	}
+	console.log(newArray);
+	var l = 0;
+	for (var props2 in areaSorted.areaPatterns) {
+        areaSorted.areaPatterns[props2] = newArray[l];
+		l++;
     }
 }
 
